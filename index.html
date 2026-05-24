@@ -444,7 +444,7 @@
       maxSizeSlider.value = p.maxKB;
       maxSizeVal.textContent = p.maxKB + 'KB';
       checkLimits();
-      if (origImg.src) doProcess();
+      if (origImg.src) reProcess();
     });
   });
 
@@ -473,6 +473,26 @@
       resultArea.classList.add('show');
       buildThumbs();
       showCurrent();
+      processAllFiles();
+    }
+    function processAllFiles(){
+      for (var i=0; i<files.length; i++) {
+        if (i === currentIdx) continue;
+        processFileAt(i);
+      }
+    }
+    function processFileAt(i){
+      var img = new Image();
+      img.onload = function(){
+        var p = presets[currentPreset];
+        var w = img.naturalWidth, h = img.naturalHeight;
+        if (p.w && p.h) { w = p.w; h = p.h; }
+        else if (p.w && !p.h) { w = Math.min(w, p.w); h = Math.round(h * (w/img.naturalWidth)); }
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        compressLoopSilent(c, parseInt(qualitySlider.value)/100, i);
+      };
+      img.src = files[i].dataURL;
     }
   }
 
@@ -556,21 +576,9 @@
 
   function reProcess(){
     if (origImg.src) doProcess();
-    // reprocess all batch files
     if (files.length > 1) {
       for (var i=0; i<files.length; i++) {
-        if (i === currentIdx) continue;
-        var img = new Image();
-        img.onload = (function(idx, imgEl){
-          var p = presets[currentPreset];
-          var w = imgEl.naturalWidth, h = imgEl.naturalHeight;
-          if (p.w && p.h) { w = p.w; h = p.h; }
-          else if (p.w && !p.h) { w = Math.min(w, p.w); h = Math.round(h * (w/imgEl.naturalWidth)); }
-          var c = document.createElement('canvas'); c.width = w; c.height = h;
-          c.getContext('2d').drawImage(imgEl, 0, 0, w, h);
-          compressLoopSilent(c, parseInt(qualitySlider.value)/100, idx);
-        }).bind(null, i);
-        img.src = files[i].dataURL;
+        if (i !== currentIdx) processFileAt(i);
       }
     }
   }
