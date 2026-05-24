@@ -374,23 +374,24 @@
 
   // --- Batch file handling ---
   function handleFiles(fileList){
-    var imgs = Array.from(fileList).filter(function(f){ return f && /^image\//.test(f.type); }).slice(0,10);
+    var arr = []; for (var i=0; i<fileList.length; i++) arr.push(fileList[i]);
+    var imgs = arr.filter(function(f){ return f && /^image\//.test(f.type); }).slice(0,10);
     if (!imgs.length) { alert('Please select image files.'); return; }
     files = []; results = []; currentIdx = 0;
-    var total = imgs.length;
-    var loaded = 0;
-    var skipped = 0;
-    imgs.forEach(function(file, i){
-      if (file.size > 30*1024*1024) { alert(file.name + ' is too large (>30MB), skipped.'); skipped++; return; }
+    var total = 0;
+    imgs.forEach(function(file){
+      if (file.size > 30*1024*1024) { alert(file.name + ' is too large (>30MB), skipped.'); return; }
+      total++;
       var reader = new FileReader();
       reader.onload = function(e){
         files.push({ name: file.name, dataURL: e.target.result, size: file.size });
         results.push(null);
-        loaded++;
-        if (loaded + skipped === total) onAllLoaded();
+        if (files.length === total) onAllLoaded();
       };
+      reader.onerror = function(){ if (files.length === total) onAllLoaded(); };
       reader.readAsDataURL(file);
     });
+    if (!total) return;
     function onAllLoaded(){
       if (!files.length) return;
       resultArea.classList.add('show');
