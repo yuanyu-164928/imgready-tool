@@ -143,17 +143,19 @@
   .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
 
   /* Features */
-  .features { max-width: 900px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 16px; }
+  .why-title { font-size: 26px; font-weight: 700; color: var(--text); text-align: center; margin-top: 24px; letter-spacing: -0.3px; }
+  .features { max-width: 900px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 18px; }
   .feat {
     background: #fff; border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 28px; text-align: center;
+    border-radius: var(--radius); padding: 32px 28px; text-align: center;
     transition: border-color 0.2s, box-shadow 0.2s;
     box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   }
   .feat:hover { border-color: var(--accent); }
-  .feat .f-icon { font-size: 28px; margin-bottom: 10px; }
-  .feat h4 { font-size: 16px; color: var(--text); margin-bottom: 6px; font-weight: 600; }
-  .feat p { font-size: 14px; color: var(--sub); line-height: 1.55; }
+  .feat .f-icon { font-size: 30px; margin-bottom: 12px; }
+  .feat h4 { font-size: 17px; color: var(--text); margin-bottom: 6px; font-weight: 600; }
+  .feat .feat-sub { font-size: 14px; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+  .feat p { font-size: 15px; color: var(--sub); line-height: 1.6; }
 
   /* Footer */
   footer {
@@ -246,21 +248,25 @@
     </div>
   </div>
 
+  <h2 class="why-title">Why choose imgready?</h2>
   <div class="features" id="features">
     <div class="feat">
       <div class="f-icon">&#x1F512;</div>
-      <h4>100% Private</h4>
-      <p>Everything stays in your browser. No file ever leaves your device.</p>
+      <h4>100% Private &amp; Secure</h4>
+      <p class="feat-sub">Your images never leave your device</p>
+      <p>Every operation runs locally in your browser. No server uploads, no cloud storage, no data collection. Your files stay completely private, always.</p>
     </div>
     <div class="feat">
       <div class="f-icon">&#x26A1;</div>
-      <h4>Instant Results</h4>
-      <p>No upload, no waiting. Changes appear immediately.</p>
+      <h4>Blazing Fast Processing</h4>
+      <p class="feat-sub">Zero wait time, instant preview</p>
+      <p>No uploading means no waiting. Drag, drop, see changes in real time. Adjust quality and size with instant visual feedback.</p>
     </div>
     <div class="feat">
       <div class="f-icon">&#x1F4F1;</div>
-      <h4>Platform Presets</h4>
-      <p>Perfect sizes for Discord, Email, Instagram, Twitter, YouTube & LinkedIn.</p>
+      <h4>Perfect Platform Presets</h4>
+      <p class="feat-sub">Optimized for every social platform</p>
+      <p>Built-in presets for Discord, Email, Instagram, Twitter/X, YouTube, and LinkedIn. No need to search for size guidelines — we've got them ready.</p>
     </div>
   </div>
 </main>
