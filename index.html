@@ -142,6 +142,11 @@
     display: flex; align-items: center; gap: 8px;
     animation: fadeSlideIn 0.2s ease;
   }
+  .safari-note {
+    font-size: 12px; color: var(--text-muted); text-align: center;
+    margin-top: 12px; padding: 8px 14px; background: #fffbeb;
+    border-radius: var(--radius-sm); border: 1px solid #fde68a; line-height: 1.5;
+  }
   .batch-strip { margin-bottom: 18px; }
   .batch-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; }
   .batch-thumbs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
@@ -354,6 +359,7 @@
       <button class="btn btn-primary" id="downloadAllBtn" style="display:none;">&#x2B07; Download All</button>
       <button class="btn btn-outline" id="newFileBtn">Try Another Image</button>
     </div>
+    <p class="safari-note" id="safariNote" style="display:none;">&#x26A0; Safari does not support batch downloading. For best experience, we recommend <strong>Chrome</strong> or <strong>Edge</strong>. On Safari, use the individual Download buttons above.</p>
   </div>
 
   <h2 class="why-title">Why choose imgready?</h2>
@@ -405,6 +411,7 @@
   var downloadBtn = document.getElementById('downloadBtn');
   var downloadAllBtn = document.getElementById('downloadAllBtn');
   var newFileBtn = document.getElementById('newFileBtn');
+  var safariNote = document.getElementById('safariNote');
   var origImg = document.getElementById('previewOrig');
   var newImg = document.getElementById('previewNew');
   var origDims = document.getElementById('origDims');
@@ -498,9 +505,10 @@
 
   function buildThumbs(){
     batchThumbs.innerHTML = '';
-    if (files.length <= 1) { batchStrip.style.display = 'none'; downloadAllBtn.style.display = 'none'; return; }
+    if (files.length <= 1) { batchStrip.style.display = 'none'; downloadAllBtn.style.display = 'none'; safariNote.style.display = 'none'; return; }
     batchStrip.style.display = 'block';
     downloadAllBtn.style.display = 'inline-flex';
+    safariNote.style.display = 'block';
     batchLabel.textContent = files.length + ' files';
     files.forEach(function(f, i){
       var row = document.createElement('div');
@@ -633,7 +641,7 @@
   newFileBtn.addEventListener('click', function(){
     resultArea.classList.remove('show'); files = []; results = []; currentIdx = 0;
     resultBlob = null; fileInput.value = ''; batchStrip.style.display = 'none';
-    downloadAllBtn.style.display = 'none';
+    downloadAllBtn.style.display = 'none'; safariNote.style.display = 'none';
   });
   document.addEventListener('paste', function(e){
     var items = e.clipboardData && e.clipboardData.items; if (!items) return;
