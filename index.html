@@ -6,7 +6,7 @@
 <meta name="description" content="Free online image resizer & compressor for Discord, Email, Instagram, Twitter, YouTube and more. 100% browser-based — no upload, private, fast and easy to use.">
 <title>imgready — Free Image Resizer for Discord, Social Media & Email</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c3aed'/%3E%3Cpath d='M14 8l-4 10h4l-1 6 7-10h-4l2-6z' fill='%23fff' opacity='.55'/%3E%3Cpath d='M20 8l-5 12h4l-1 4 6-12h-3.5l1-4z' fill='%23fff'/%3E%3C/svg%3E"&gt;
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" onerror="window._jszipFailed=1"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8394945879571540" crossorigin="anonymous"></script>
 <style>
   :root {
@@ -564,7 +564,13 @@
   }
 
   function downloadAll(){
-    if (results.length <= 1 || typeof JSZip === 'undefined') return;
+    if (results.length <= 1) return;
+    if (typeof JSZip === 'undefined') {
+      alert('ZIP library is loading, please try again in a moment.');
+      return;
+    }
+    downloadAllBtn.textContent = 'Packing ZIP...';
+    downloadAllBtn.disabled = true;
     var zip = new JSZip();
     results.forEach(function(blob, i){
       if (!blob) return;
@@ -577,6 +583,12 @@
       a.href = url; a.download = 'imgready-batch.zip';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      downloadAllBtn.textContent = '📦 Download All (ZIP)';
+      downloadAllBtn.disabled = false;
+    }).catch(function(err){
+      alert('Failed to create ZIP: ' + err.message);
+      downloadAllBtn.textContent = '📦 Download All (ZIP)';
+      downloadAllBtn.disabled = false;
     });
   }
 
