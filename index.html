@@ -514,12 +514,15 @@
       row.querySelector('.thumb-dl').addEventListener('click', function(e){
         e.stopPropagation();
         if (!results[i]) return;
-        var url = URL.createObjectURL(results[i]);
-        var a = document.createElement('a');
-        var name = f.name.replace(/\.[^.]+$/, '') || 'imgready';
-        a.href = url; a.download = name + '.jpg';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        var reader = new FileReader();
+        reader.onload = function(ev){
+          var a = document.createElement('a');
+          var name = f.name.replace(/\.[^.]+$/, '') || 'imgready';
+          a.href = ev.target.result; a.download = name + '.jpg';
+          document.body.appendChild(a); a.click();
+          setTimeout(function(){ document.body.removeChild(a); }, 1000);
+        };
+        reader.readAsDataURL(results[i]);
         row.querySelector('.thumb-dl').classList.add('done');
         row.querySelector('.thumb-dl').textContent = 'Done';
       });
@@ -598,13 +601,16 @@
     results.forEach(function(blob, i){
       if (!blob) return;
       setTimeout(function(){
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        var name = files[i].name.replace(/\.[^.]+$/, '') || 'imgready';
-        a.href = url; a.download = name + '.jpg';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        if (btns[i]) { btns[i].classList.add('done'); btns[i].textContent = 'Done'; }
+        var reader = new FileReader();
+        reader.onload = function(ev){
+          var a = document.createElement('a');
+          var name = files[i].name.replace(/\.[^.]+$/, '') || 'imgready';
+          a.href = ev.target.result; a.download = name + '.jpg';
+          document.body.appendChild(a); a.click();
+          setTimeout(function(){ document.body.removeChild(a); }, 1000);
+          if (btns[i]) { btns[i].classList.add('done'); btns[i].textContent = 'Done'; }
+        };
+        reader.readAsDataURL(blob);
       }, delay);
       delay += 400;
     });
@@ -622,11 +628,15 @@
   maxSizeSlider.addEventListener('input', function(){ maxSizeVal.textContent = maxSizeSlider.value+'KB'; checkLimits(); reProcess(); });
   downloadBtn.addEventListener('click', function(){
     if (!resultBlob) return;
-    var url = URL.createObjectURL(resultBlob);
-    var a = document.createElement('a');
-    var name = files[currentIdx].name.replace(/\.[^.]+$/, '') || 'imgready';
-    a.href = url; a.download = name + '.jpg'; a.click();
-    URL.revokeObjectURL(url);
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var a = document.createElement('a');
+      var name = files[currentIdx].name.replace(/\.[^.]+$/, '') || 'imgready';
+      a.href = ev.target.result; a.download = name + '.jpg';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ document.body.removeChild(a); }, 1000);
+    };
+    reader.readAsDataURL(resultBlob);
   });
   downloadAllBtn.addEventListener('click', downloadAll);
   newFileBtn.addEventListener('click', function(){
