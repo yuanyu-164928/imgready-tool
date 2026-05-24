@@ -419,6 +419,7 @@
   var imagesRow = document.getElementById('imagesRow');
   var files = [];       // all loaded files {name, dataURL, size}
   var results = [];     // all processed blobs
+  var dataURLs = [];    // pre-converted data URLs for download
   var currentIdx = 0;   // which file is previewed
   var resultBlob = null;
 
@@ -453,7 +454,7 @@
     var arr = []; for (var i=0; i<fileList.length; i++) arr.push(fileList[i]);
     var imgs = arr.filter(function(f){ return f && /^image\//.test(f.type); }).slice(0,10);
     if (!imgs.length) { alert('Please select image files.'); return; }
-    files = []; results = []; currentIdx = 0;
+    files = []; results = []; dataURLs = []; currentIdx = 0;
     var total = 0;
     imgs.forEach(function(file){
       if (file.size > 30*1024*1024) { alert(file.name + ' is too large (>30MB), skipped.'); return; }
@@ -513,16 +514,12 @@
       row.querySelector('.thumb-preview').addEventListener('click', function(){ selectFile(i); });
       row.querySelector('.thumb-dl').addEventListener('click', function(e){
         e.stopPropagation();
-        if (!results[i]) return;
-        var reader = new FileReader();
-        reader.onload = function(ev){
-          var a = document.createElement('a');
-          var name = f.name.replace(/\.[^.]+$/, '') || 'imgready';
-          a.href = ev.target.result; a.download = name + '.jpg';
-          document.body.appendChild(a); a.click();
-          setTimeout(function(){ document.body.removeChild(a); }, 1000);
-        };
-        reader.readAsDataURL(results[i]);
+        if (!dataURLs[i]) return;
+        var a = document.createElement('a');
+        var name = f.name.replace(/\.[^.]+$/, '') || 'imgready';
+        a.href = dataURLs[i]; a.download = name + '.jpg';
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ document.body.removeChild(a); }, 2000);
         row.querySelector('.thumb-dl').classList.add('done');
         row.querySelector('.thumb-dl').textContent = 'Done';
       });
@@ -563,6 +560,11 @@
     img.src = origImg.src;
   }
 
+  function cacheDataURL(idx, blob){
+    var r = new FileReader();
+    r.onload = function(){ dataURLs[idx] = r.result; };
+    r.readAsDataURL(blob);
+  }
   function compressLoop(canvas, quality, idx){
     canvas.toBlob(function(blob){
       var maxKB = parseInt(maxSizeSlider.value);
@@ -570,6 +572,7 @@
         compressLoop(canvas, quality - 0.05, idx);
       } else {
         results[idx] = blob;
+        cacheDataURL(idx, blob);
         newImg.src = URL.createObjectURL(blob);
         fileSizes.textContent = fileSizes.textContent.split(' →')[0] + ' → ' + (blob.size/1024).toFixed(1) + ' KB';
         resultBlob = blob;
@@ -590,27 +593,23 @@
     canvas.toBlob(function(blob){
       var maxKB = parseInt(maxSizeSlider.value);
       if (blob.size/1024 > maxKB && quality > 0.1) { compressLoopSilent(canvas, quality-0.05, idx); }
-      else { results[idx] = blob; }
+      else { results[idx] = blob; cacheDataURL(idx, blob); }
     }, 'image/jpeg', quality);
   }
 
   function downloadAll(){
-    if (results.length <= 1) return;
+    if (dataURLs.length <= 1) return;
     var delay = 0;
     var btns = batchThumbs.querySelectorAll('.thumb-dl');
-    results.forEach(function(blob, i){
-      if (!blob) return;
+    dataURLs.forEach(function(dataUrl, i){
+      if (!dataUrl) return;
       setTimeout(function(){
-        var reader = new FileReader();
-        reader.onload = function(ev){
-          var a = document.createElement('a');
-          var name = files[i].name.replace(/\.[^.]+$/, '') || 'imgready';
-          a.href = ev.target.result; a.download = name + '.jpg';
-          document.body.appendChild(a); a.click();
-          setTimeout(function(){ document.body.removeChild(a); }, 1000);
-          if (btns[i]) { btns[i].classList.add('done'); btns[i].textContent = 'Done'; }
-        };
-        reader.readAsDataURL(blob);
+        var a = document.createElement('a');
+        var name = files[i].name.replace(/\.[^.]+$/, '') || 'imgready';
+        a.href = dataUrl; a.download = name + '.jpg';
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ document.body.removeChild(a); }, 2000);
+        if (btns[i]) { btns[i].classList.add('done'); btns[i].textContent = 'Done'; }
       }, delay);
       delay += 400;
     });
@@ -627,20 +626,16 @@
   qualitySlider.addEventListener('input', function(){ qualityVal.textContent = qualitySlider.value+'%'; reProcess(); });
   maxSizeSlider.addEventListener('input', function(){ maxSizeVal.textContent = maxSizeSlider.value+'KB'; checkLimits(); reProcess(); });
   downloadBtn.addEventListener('click', function(){
-    if (!resultBlob) return;
-    var reader = new FileReader();
-    reader.onload = function(ev){
-      var a = document.createElement('a');
-      var name = files[currentIdx].name.replace(/\.[^.]+$/, '') || 'imgready';
-      a.href = ev.target.result; a.download = name + '.jpg';
-      document.body.appendChild(a); a.click();
-      setTimeout(function(){ document.body.removeChild(a); }, 1000);
-    };
-    reader.readAsDataURL(resultBlob);
+    if (!dataURLs[currentIdx]) return;
+    var a = document.createElement('a');
+    var name = files[currentIdx].name.replace(/\.[^.]+$/, '') || 'imgready';
+    a.href = dataURLs[currentIdx]; a.download = name + '.jpg';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); }, 2000);
   });
   downloadAllBtn.addEventListener('click', downloadAll);
   newFileBtn.addEventListener('click', function(){
-    resultArea.classList.remove('show'); files = []; results = []; currentIdx = 0;
+    resultArea.classList.remove('show'); files = []; results = []; dataURLs = []; currentIdx = 0;
     resultBlob = null; fileInput.value = ''; batchStrip.style.display = 'none';
     downloadAllBtn.style.display = 'none';
   });
