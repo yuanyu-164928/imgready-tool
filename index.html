@@ -106,6 +106,16 @@
   .result-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
   .preset-badge { font-size: 13px; padding: 4px 14px; border-radius: 12px; background: var(--accent-bg); color: var(--accent); font-weight: 600; }
   .size-info { font-size: 14px; color: var(--sub); }
+  .preset-info {
+    font-size: 13px; color: var(--sub); padding: 10px 14px;
+    background: #f9fafb; border-radius: 8px; margin-bottom: 12px;
+    border-left: 3px solid var(--accent); line-height: 1.5;
+  }
+  .limit-warn {
+    font-size: 13px; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px;
+    background: #fef2f2; color: #991b1b; border-left: 3px solid var(--red);
+    line-height: 1.5; font-weight: 500;
+  }
 
   .images-row { display: flex; gap: 20px; margin-bottom: 20px; }
   .images-row > div { flex: 1; text-align: center; }
@@ -220,6 +230,8 @@
       <span class="preset-badge" id="presetLabel">Email</span>
       <span class="size-info" id="fileSizes"></span>
     </div>
+    <div class="preset-info" id="presetInfo">Safe attachment size: under 500KB. Width capped at 1200px.</div>
+    <div class="limit-warn" id="limitWarn" style="display:none;"></div>
     <div class="images-row">
       <div>
         <div class="img-box"><img id="previewOrig" alt="Original"></div>
@@ -278,13 +290,13 @@
 <script>
 (function(){
   var presets = {
-    discord:  { name:'Discord',   w:0, h:0, maxKB:8000 },
-    email:    { name:'Email',     w:1200, h:0, maxKB:500 },
-    instagram:{ name:'Instagram', w:1080, h:1080, maxKB:1000 },
-    twitter:  { name:'Twitter/X', w:1200, h:675, maxKB:5000 },
-    youtube:  { name:'YouTube',   w:1280, h:720, maxKB:2000 },
-    linkedin: { name:'LinkedIn',  w:1200, h:627, maxKB:2000 },
-    custom:   { name:'Custom',    w:0, h:0, maxKB:2000 }
+    discord:  { name:'Discord',   w:0, h:0, maxKB:8000, info:'Free limit: 8MB per file (Nitro: 100MB). No dimension restrictions.' },
+    email:    { name:'Email',     w:1200, h:0, maxKB:500,  info:'Safe attachment size: under 500KB. Width capped at 1200px.' },
+    instagram:{ name:'Instagram', w:1080, h:1080, maxKB:1000, info:'Square post: 1080×1080px. Instagram compresses heavily — keep quality high.' },
+    twitter:  { name:'Twitter/X', w:1200, h:675, maxKB:5000, info:'In-stream image: 16:9 ratio at 1200×675px. Max 5MB per image.' },
+    youtube:  { name:'YouTube',   w:1280, h:720, maxKB:2000, info:'Standard thumbnail: 1280×720px. Keep under 2MB for fast upload.' },
+    linkedin: { name:'LinkedIn',  w:1200, h:627, maxKB:2000, info:'Share image: 1.91:1 ratio at 1200×627px. Max 2MB recommended.' },
+    custom:   { name:'Custom',    w:0, h:0, maxKB:8000, info:'No preset restrictions. Adjust dimensions and size freely.' }
   };
   var currentPreset = 'email';
   var dropZone = document.getElementById('dropZone');
@@ -301,7 +313,20 @@
   var newDims = document.getElementById('newDims');
   var fileSizes = document.getElementById('fileSizes');
   var presetLabel = document.getElementById('presetLabel');
+  var presetInfo = document.getElementById('presetInfo');
+  var limitWarn = document.getElementById('limitWarn');
   var resultBlob = null;
+
+  function checkLimits(){
+    var p = presets[currentPreset];
+    var warn = '';
+    var curKB = parseInt(maxSizeSlider.value);
+    if (curKB > p.maxKB) {
+      warn = '&#x26A0; File size exceeds ' + p.name + ' limit (' + p.maxKB + 'KB). Your image may fail to upload or be rejected.';
+    }
+    if (warn) { limitWarn.innerHTML = warn; limitWarn.style.display = 'block'; }
+    else { limitWarn.style.display = 'none'; }
+  }
 
   document.querySelectorAll('.preset-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -310,8 +335,10 @@
       currentPreset = btn.dataset.preset;
       var p = presets[currentPreset];
       presetLabel.textContent = p.name;
+      presetInfo.textContent = p.info;
       maxSizeSlider.value = p.maxKB;
       maxSizeVal.textContent = p.maxKB + 'KB';
+      checkLimits();
       if (origImg.src) doProcess();
     });
   });
@@ -371,7 +398,7 @@
     if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   });
   qualitySlider.addEventListener('input', function(){ qualityVal.textContent = qualitySlider.value+'%'; reProcess(); });
-  maxSizeSlider.addEventListener('input', function(){ maxSizeVal.textContent = maxSizeSlider.value+'KB'; reProcess(); });
+  maxSizeSlider.addEventListener('input', function(){ maxSizeVal.textContent = maxSizeSlider.value+'KB'; checkLimits(); reProcess(); });
   downloadBtn.addEventListener('click', function(){
     if (!resultBlob) return;
     var url = URL.createObjectURL(resultBlob);
@@ -386,7 +413,7 @@
     for (var i=0; i<items.length; i++){ if(/^image\//.test(items[i].type)){ e.preventDefault(); handleFile(items[i].getAsFile()); return; } }
   });
 
-  var p = presets[currentPreset]; maxSizeSlider.value = p.maxKB; maxSizeVal.textContent = p.maxKB+'KB'; presetLabel.textContent = p.name;
+  var p = presets[currentPreset]; maxSizeSlider.value = p.maxKB; maxSizeVal.textContent = p.maxKB+'KB'; presetLabel.textContent = p.name; presetInfo.textContent = p.info;
 })();
 </script>
 
