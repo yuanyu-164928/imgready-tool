@@ -377,23 +377,26 @@
     var imgs = Array.from(fileList).filter(function(f){ return f && /^image\//.test(f.type); }).slice(0,10);
     if (!imgs.length) { alert('Please select image files.'); return; }
     files = []; results = []; currentIdx = 0;
+    var total = imgs.length;
     var loaded = 0;
+    var skipped = 0;
     imgs.forEach(function(file, i){
-      if (file.size > 30*1024*1024) { alert(file.name + ' is too large (>30MB), skipped.'); return; }
+      if (file.size > 30*1024*1024) { alert(file.name + ' is too large (>30MB), skipped.'); skipped++; return; }
       var reader = new FileReader();
       reader.onload = function(e){
         files.push({ name: file.name, dataURL: e.target.result, size: file.size });
         results.push(null);
         loaded++;
-        if (loaded === imgs.length || files.length === imgs.length) showCurrent();
+        if (loaded + skipped === total) onAllLoaded();
       };
       reader.readAsDataURL(file);
     });
-    if (!files.length) return;
-    resultArea.classList.add('show');
-    buildThumbs();
-    showCurrent();
-  }
+    function onAllLoaded(){
+      if (!files.length) return;
+      resultArea.classList.add('show');
+      buildThumbs();
+      showCurrent();
+    }
 
   function buildThumbs(){
     batchThumbs.innerHTML = '';
