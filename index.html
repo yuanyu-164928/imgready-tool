@@ -6,6 +6,7 @@
 <meta name="description" content="Free online image resizer & compressor for Discord, Email, Instagram, Twitter, YouTube and more. 100% browser-based — no upload, private, fast and easy to use.">
 <title>imgready — Free Image Resizer for Discord, Social Media & Email</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c3aed'/%3E%3Cpath d='M14 8l-4 10h4l-1 6 7-10h-4l2-6z' fill='%23fff' opacity='.55'/%3E%3Cpath d='M20 8l-5 12h4l-1 4 6-12h-3.5l1-4z' fill='%23fff'/%3E%3C/svg%3E"&gt;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8394945879571540" crossorigin="anonymous"></script>
 <style>
   :root {
@@ -346,6 +347,7 @@
     </div>
     <div class="btn-row">
       <button class="btn btn-primary" id="downloadBtn">&#x2B07; Download</button>
+      <button class="btn btn-primary" id="downloadAllBtn" style="display:none;">&#x1F4E6; Download All (ZIP)</button>
       <button class="btn btn-outline" id="newFileBtn">Try Another Image</button>
     </div>
   </div>
@@ -397,6 +399,7 @@
   var maxSizeSlider = document.getElementById('maxSizeSlider');
   var maxSizeVal = document.getElementById('maxSizeVal');
   var downloadBtn = document.getElementById('downloadBtn');
+  var downloadAllBtn = document.getElementById('downloadAllBtn');
   var newFileBtn = document.getElementById('newFileBtn');
   var origImg = document.getElementById('previewOrig');
   var newImg = document.getElementById('previewNew');
@@ -471,23 +474,15 @@
 
   function buildThumbs(){
     batchThumbs.innerHTML = '';
-    if (files.length <= 1) { batchStrip.style.display = 'none'; return; }
+    if (files.length <= 1) { batchStrip.style.display = 'none'; downloadAllBtn.style.display = 'none'; return; }
     batchStrip.style.display = 'block';
-    batchLabel.textContent = files.length + ' files selected — tap thumbnail to download each';
+    downloadAllBtn.style.display = 'inline-flex';
+    batchLabel.textContent = files.length + ' files — click a thumbnail to preview, or Download All for ZIP';
     files.forEach(function(f, i){
       var div = document.createElement('div');
       div.className = 'thumb' + (i === currentIdx ? ' active' : '');
       div.innerHTML = '<img src="' + f.dataURL + '" alt=""><span class="thumb-idx">#' + (i+1) + '</span>';
-      div.addEventListener('click', function(e){
-        e.stopPropagation();
-        if (!results[i]) return;
-        var url = URL.createObjectURL(results[i]);
-        var a = document.createElement('a');
-        var name = f.name.replace(/\.[^.]+$/, '') || 'imgready';
-        a.href = url; a.download = name + '.jpg';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      });
+      div.addEventListener('click', function(){ selectFile(i); });
       batchThumbs.appendChild(div);
     });
   }
@@ -568,6 +563,23 @@
     }, 'image/jpeg', quality);
   }
 
+  function downloadAll(){
+    if (results.length <= 1 || typeof JSZip === 'undefined') return;
+    var zip = new JSZip();
+    results.forEach(function(blob, i){
+      if (!blob) return;
+      var name = (files[i].name.replace(/\.[^.]+$/, '') || 'imgready') + '.jpg';
+      zip.file(name, blob);
+    });
+    zip.generateAsync({type:'blob'}).then(function(zipBlob){
+      var url = URL.createObjectURL(zipBlob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'imgready-batch.zip';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
   dropZone.addEventListener('click', function(){ fileInput.click(); });
   fileInput.addEventListener('change', function(e){ if(e.target.files.length) handleFiles(e.target.files); });
   dropZone.addEventListener('dragover', function(e){ e.preventDefault(); dropZone.classList.add('drag-over'); });
@@ -586,9 +598,11 @@
     a.href = url; a.download = name + '.jpg'; a.click();
     URL.revokeObjectURL(url);
   });
+  downloadAllBtn.addEventListener('click', downloadAll);
   newFileBtn.addEventListener('click', function(){
     resultArea.classList.remove('show'); files = []; results = []; currentIdx = 0;
     resultBlob = null; fileInput.value = ''; batchStrip.style.display = 'none';
+    downloadAllBtn.style.display = 'none';
   });
   document.addEventListener('paste', function(e){
     var items = e.clipboardData && e.clipboardData.items; if (!items) return;
