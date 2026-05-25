@@ -15,6 +15,7 @@
 <title>imgready — Free Online Image Resizer & Compressor | Discord, Instagram, X, Email</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c3aed'/%3E%3Cpath d='M14 8l-4 10h4l-1 6 7-10h-4l2-6z' fill='%23fff' opacity='.55'/%3E%3Cpath d='M20 8l-5 12h4l-1 4 6-12h-3.5l1-4z' fill='%23fff'/%3E%3C/svg%3E"&gt;
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8394945879571540" crossorigin="anonymous"></script>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="65c75e37-dc6d-427d-a555-d454a95b6583"></script>
 <style>
   :root {
     --bg: #fafbfc;
@@ -566,6 +567,7 @@
       document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.remove('active'); });
       btn.classList.add('active');
       currentPreset = btn.dataset.preset;
+      umami.track('select_preset', {preset: currentPreset});
       var p = presets[currentPreset];
       presetLabel.textContent = p.name;
       presetInfo.textContent = p.info;
@@ -581,10 +583,12 @@
     var arr = []; for (var i=0; i<fileList.length; i++) arr.push(fileList[i]);
     var imgs = arr.filter(function(f){ return f && /^image\//.test(f.type); }).slice(0,10);
     if (!imgs.length) { alert('Please select image files.'); return; }
+    umami.track('upload_image', {method: 'drop_or_click'});
+    if (imgs.length >= 2) { umami.track('batch_upload', {count: String(imgs.length)}); }
     files = []; results = []; currentIdx = 0;
     var total = 0;
     imgs.forEach(function(file){
-      if (file.size > 30*1024*1024) { alert(file.name + ' is too large (>30MB), skipped.'); return; }
+      if (file.size > 30*1024*1024) { umami.track('error_file_size', {name: file.name, size_kb: String(Math.round(file.size/1024))}); alert(file.name + ' is too large (>30MB), skipped.'); return; }
       total++;
       var reader = new FileReader();
       reader.onload = function(e){
@@ -747,10 +751,28 @@
     e.preventDefault(); dropZone.classList.remove('drag-over');
     if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
   });
-  qualitySlider.addEventListener('input', function(){ qualityVal.textContent = qualitySlider.value+'%'; reProcess(); });
-  maxSizeSlider.addEventListener('input', function(){ maxSizeVal.textContent = maxSizeSlider.value+'KB'; checkLimits(); reProcess(); });
+  var qualityDebounce = null;
+  qualitySlider.addEventListener('input', function(){
+    qualityVal.textContent = qualitySlider.value+'%';
+    reProcess();
+    if (qualityDebounce) clearTimeout(qualityDebounce);
+    qualityDebounce = setTimeout(function(){
+      umami.track('adjust_quality', {value: String(qualitySlider.value)});
+    }, 800);
+  });
+  var sizeDebounce = null;
+  maxSizeSlider.addEventListener('input', function(){
+    maxSizeVal.textContent = maxSizeSlider.value+'KB';
+    checkLimits();
+    reProcess();
+    if (sizeDebounce) clearTimeout(sizeDebounce);
+    sizeDebounce = setTimeout(function(){
+      umami.track('adjust_size', {value: String(maxSizeSlider.value)});
+    }, 800);
+  });
   downloadBtn.addEventListener('click', function(){
     if (!resultBlob) return;
+    umami.track('download_single', {preset: currentPreset});
     var url = URL.createObjectURL(resultBlob);
     var a = document.createElement('a');
     var name = files[currentIdx].name.replace(/\.[^.]+$/, '') || 'imgready';
@@ -758,15 +780,19 @@
     document.body.appendChild(a); a.click();
     setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 3000);
   });
-  downloadAllBtn.addEventListener('click', downloadAll);
+  downloadAllBtn.addEventListener('click', function(){
+    umami.track('download_all', {count: String(results.filter(Boolean).length)});
+    downloadAll();
+  });
   newFileBtn.addEventListener('click', function(){
+    umami.track('reset');
     resultArea.classList.remove('show'); files = []; results = []; currentIdx = 0;
     resultBlob = null; fileInput.value = ''; batchStrip.style.display = 'none';
     downloadAllBtn.style.display = 'none'; safariNote.style.display = 'none';
   });
   document.addEventListener('paste', function(e){
     var items = e.clipboardData && e.clipboardData.items; if (!items) return;
-    for (var i=0; i<items.length; i++){ if(/^image\//.test(items[i].type)){ e.preventDefault(); handleFiles([items[i].getAsFile()]); return; } }
+    for (var i=0; i<items.length; i++){ if(/^image\//.test(items[i].type)){ e.preventDefault(); umami.track('upload_image', {method: 'paste'}); handleFiles([items[i].getAsFile()]); return; } }
   });
 
   var p = presets[currentPreset]; maxSizeSlider.value = p.maxKB; maxSizeVal.textContent = p.maxKB+'KB'; presetLabel.textContent = p.name; presetInfo.textContent = p.info;
