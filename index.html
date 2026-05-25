@@ -3,8 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Free online image resizer & compressor for Discord, Email, Instagram, Twitter, YouTube and more. 100% browser-based — no upload, private, fast and easy to use.">
-<title>imgready — Free Image Resizer for Discord, Social Media & Email</title>
+<meta name="description" content="Free online image resizer & compressor. Resize images for Discord (8MB), Instagram (1080×1080), X/Twitter (16:9), Email, YouTube thumbnails & LinkedIn. Batch process up to 10 images. 100% browser-based — no upload, private, fast.">
+<meta property="og:title" content="imgready — Free Online Image Resizer & Compressor">
+<meta property="og:description" content="Resize & compress images for Discord, Instagram, X, Email and more. 100% browser-based, no upload, free.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.imgready.top">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="imgready — Free Online Image Resizer & Compressor">
+<meta name="twitter:description" content="Resize & compress images for every platform. 100% browser-based, no upload, free.">
+<link rel="canonical" href="https://www.imgready.top">
+<title>imgready — Free Online Image Resizer & Compressor | Discord, Instagram, X, Email</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c3aed'/%3E%3Cpath d='M14 8l-4 10h4l-1 6 7-10h-4l2-6z' fill='%23fff' opacity='.55'/%3E%3Cpath d='M20 8l-5 12h4l-1 4 6-12h-3.5l1-4z' fill='%23fff'/%3E%3C/svg%3E"&gt;
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8394945879571540" crossorigin="anonymous"></script>
 <style>
@@ -277,7 +285,59 @@
     .hero-text h2 { font-size: 22px; }
     .controls { gap: 12px; }
   }
+
+  /* How-to */
+  .how-to { max-width: 900px; width: 100%; }
+  .how-to h2 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 18px; text-align: center; letter-spacing: -0.3px; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 14px; }
+  .step {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px 22px; display: flex; gap: 14px; align-items: flex-start;
+    box-shadow: var(--shadow-sm); transition: all var(--transition);
+  }
+  .step:hover { border-color: var(--accent); box-shadow: var(--shadow-md); }
+  .step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-weight: 700; font-size: 15px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .step h4 { font-size: 15px; color: var(--text); margin-bottom: 4px; font-weight: 700; }
+  .step p { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+
+  /* FAQ */
+  .faq-section { max-width: 900px; width: 100%; }
+  .faq-section h2 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 18px; text-align: center; letter-spacing: -0.3px; }
+  .faq-list { display: flex; flex-direction: column; gap: 10px; }
+  .faq-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .faq-q {
+    width: 100%; text-align: left; background: none; border: none;
+    padding: 18px 22px; font-size: 15px; font-weight: 600; color: var(--text);
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    transition: color var(--transition);
+  }
+  .faq-q:hover { color: var(--accent); }
+  .faq-q .arrow { font-size: 12px; transition: transform var(--transition); color: var(--text-muted); }
+  .faq-item.open .faq-q .arrow { transform: rotate(180deg); color: var(--accent); }
+  .faq-a { display: none; padding: 0 22px 20px; font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+  .faq-item.open .faq-a { display: block; }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "imgready",
+  "url": "https://www.imgready.top",
+  "description": "Free online image resizer & compressor with platform presets for Discord, Instagram, Twitter/X, YouTube, LinkedIn and Email. 100% browser-based, no upload required.",
+  "applicationCategory": "Multimedia",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "browserRequirements": "Requires JavaScript"
+}
+</script>
 </head>
 <body>
 
@@ -362,6 +422,33 @@
     <p class="safari-note" id="safariNote" style="display:none;">&#x26A0; Batch download is not supported on iOS (all browsers on iPhone/iPad use Safari's engine). For the full experience, please use <strong>Chrome</strong> or <strong>Edge</strong> on desktop. On mobile, use the individual Download buttons above.</p>
   </div>
 
+  <section class="how-to">
+    <h2>How to resize images in 3 steps</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h4>Pick a platform preset</h4>
+          <p>Choose from Discord, Email, Instagram, Twitter/X, YouTube, LinkedIn, or set your own Custom dimensions.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h4>Upload your images</h4>
+          <p>Drag & drop up to 10 images, click to browse, or paste from clipboard. Supports JPEG, PNG, WebP, GIF — up to 30MB each.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h4>Adjust & download</h4>
+          <p>Tweak quality and max file size with live preview. Download individually or batch download all at once.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <h2 class="why-title">Why choose imgready?</h2>
   <div class="features" id="features">
     <div class="feat">
@@ -383,6 +470,40 @@
       <p>Built-in presets for Discord, Email, Instagram, Twitter/X, YouTube, and LinkedIn. No need to search for size guidelines — we've got them ready.</p>
     </div>
   </div>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I resize an image for Discord? <span class="arrow">&#9660;</span></button>
+        <div class="faq-a">Discord's free tier limits file uploads to 8MB. Select the Discord preset in imgready, drop your image, and the tool will automatically compress it to fit. Discord has no strict dimension limits, so you can keep your original aspect ratio.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I compress an image for Email attachments? <span class="arrow">&#9660;</span></button>
+        <div class="faq-a">Most email providers cap attachments around 25MB total, but keeping each image under 500KB is the safest approach. Select the Email preset — imgready caps width at 1200px and compresses to under 500KB automatically using smart iterative compression.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">What is the best image size for Instagram? <span class="arrow">&#9660;</span></button>
+        <div class="faq-a">Instagram recommends 1080×1080px for square posts. Our Instagram preset sets this exact dimension. Even though Instagram accepts larger images, uploading at 1080px prevents Instagram's own heavy compression from degrading your image quality further.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I resize an image for Twitter / X? <span class="arrow">&#9660;</span></button>
+        <div class="faq-a">Twitter/X displays in-stream images at 1200×675px (16:9 ratio) with a 5MB file limit. The X preset in imgready applies these settings automatically. For best results on both desktop and mobile, keep this 16:9 aspect ratio.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">What size should a YouTube thumbnail be? <span class="arrow">&#9660;</span></button>
+        <div class="faq-a">YouTube recommends 1280×720px for custom thumbnails, with a 2MB file size limit. The YouTube preset in imgready matches these specs exactly. Use high quality (85-95%) since YouTube applies its own compression after upload.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I batch resize multiple images at once? <span class="arrow">&#9660;</span></button>
+        <div class="faq-a">Yes. imgready supports batch processing up to 10 images at once. Drop or select multiple files, and each one is processed individually against the same preset. You can download them one by one or use Download All for batch export.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Are my images uploaded to a server? <span class="arrow">&#9660;</span></button>
+        <div class="faq-a">No. Every operation runs locally in your browser using the Canvas API. Your images never leave your device. You can even disconnect from the internet after loading the page — the tool works fully offline.</div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
